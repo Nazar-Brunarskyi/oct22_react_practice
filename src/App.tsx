@@ -44,6 +44,11 @@ export const App: React.FC = () => {
     setInputValue('');
   };
 
+  const handleResetAll = () => {
+    setSelectedUser(0);
+    setInputValue('');
+  };
+
   const selectedUserName = usersFromServer
     .find(user => user.id === selectedUser)?.name;
 
@@ -169,7 +174,7 @@ export const App: React.FC = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
-
+                onClick={handleResetAll}
               >
                 Reset all filters
               </a>
