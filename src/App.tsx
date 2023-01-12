@@ -41,7 +41,7 @@ export const App: React.FC = () => {
   };
 
   const handleClearInput = () => {
-    setInputValue(' ');
+    setInputValue('');
   };
 
   const selectedUserName = usersFromServer
