@@ -9,11 +9,13 @@ import { findFullCategory } from './helpers';
 import categoriesFromServer from './api/categories';
 import { ProductComponent } from './components/Product';
 import { UserComponent } from './components/User';
+import { CategoryComponent } from './components/Category';
 
 export const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedUser, setSelectedUser] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   useEffect(() => {
     const productsToSet: Product[] = productsFromServer
@@ -47,6 +49,11 @@ export const App: React.FC = () => {
   const handleResetAll = () => {
     setSelectedUser(0);
     setInputValue('');
+    setSelectedCategories([]);
+  };
+
+  const handleAllCategoriesButtonClick = () => {
+    setSelectedCategories([]);
   };
 
   const selectedUserName = usersFromServer
@@ -63,6 +70,16 @@ export const App: React.FC = () => {
 
     return lowerCaseProductName.includes(lowerCaseInputValue);
   });
+
+  visibleProducts = selectedCategories.length === 0
+    ? visibleProducts
+    : visibleProducts.filter(product => {
+      if (product.category) {
+        return selectedCategories.includes(product.category?.id);
+      }
+
+      return false;
+    });
 
   const haveBeenAnyProductsFound = visibleProducts.length > 0;
 
@@ -132,41 +149,25 @@ export const App: React.FC = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={cn(
+                  'button is-success mr-6',
+                  { 'is-outlined': selectedCategories.length !== 0 },
+                )}
+                onClick={handleAllCategoriesButtonClick}
               >
                 All
               </a>
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
+              {
+                categoriesFromServer.map(category => (
+                  <CategoryComponent
+                    key={category.id}
+                    category={category}
+                    selectedCategories={selectedCategories}
+                    onSelect={setSelectedCategories}
+                  />
+                ))
+              }
             </div>
 
             <div className="panel-block">
