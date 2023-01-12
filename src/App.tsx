@@ -13,6 +13,7 @@ import { UserComponent } from './components/User';
 export const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedUser, setSelectedUser] = useState(0);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     const productsToSet: Product[] = productsFromServer
@@ -33,13 +34,30 @@ export const App: React.FC = () => {
     setProducts(productsToSet);
   }, []);
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.currentTarget.value;
+
+    setInputValue(newValue);
+  };
+
+  const handleClearInput = () => {
+    setInputValue(' ');
+  };
+
   const selectedUserName = usersFromServer
     .find(user => user.id === selectedUser)?.name;
 
-  const visibleProducts = selectedUser === 0
+  let visibleProducts = selectedUser === 0
     ? products
     : products
       .filter(product => product.category?.owner?.name === selectedUserName);
+
+  visibleProducts = visibleProducts.filter(product => {
+    const lowerCaseProductName = product.name.toLowerCase();
+    const lowerCaseInputValue = inputValue.trim().toLowerCase();
+
+    return lowerCaseProductName.includes(lowerCaseInputValue);
+  });
 
   return (
     <div className="section">
@@ -79,21 +97,27 @@ export const App: React.FC = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={inputValue}
+                  onChange={handleInputChange}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
 
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
-                </span>
+                {
+                  inputValue && (
+                    <span className="icon is-right">
+                      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                      <button
+                        data-cy="ClearButton"
+                        type="button"
+                        className="delete"
+                        onClick={handleClearInput}
+                      />
+                    </span>
+                  )
+                }
               </p>
             </div>
 
